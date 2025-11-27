@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Игра с четирицифрени числа</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f4f4f4; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    input[type="password"], input[type="text"] { width: 100%; padding: 10px; margin: 10px 0; font-size: 18px; }
+    button { padding: 10px 15px; font-size: 16px; margin: 5px; cursor: pointer; }
+    .log { margin-top: 20px; background: #eee; padding: 10px; border-radius: 5px; max-height: 250px; overflow-y: auto; }
+    .two-column { display: flex; gap: 20px; }
+    .col { flex: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Игра с четирицифрени числа</h2>
+
+    <h3>Твоето тайно число</h3>
+    <input id="secretNumber" type="password" maxlength="4" placeholder="Въведи твоето число..." />
+    <button onclick="toggleSecret()">Покажи / Скрий</button>
+
+    <hr>
+
+    <div class="two-column">
+      <div class="col">
+        <h3>Познай числото на другия човек</h3>
+        <input id="guessInput" type="text" maxlength="4" placeholder="Въведи предположение" onkeypress="handleGuess(event)" />
+        <div class="log" id="guessLog"></div>
+      </div>
+
+      <div class="col">
+        <h3>Другият познава твоето число</h3>
+        <input id="enemyGuessInput" type="text" maxlength="4" placeholder="Въведено число" onkeypress="handleEnemyGuess(event)" />
+        <div class="log" id="enemyLog"></div>
+      </div>
+    </div>
+
+    <button onclick="newGame()">Нова игра</button>
+  </div>
+
+<script>
+let secretVisible = false;
+
+function toggleSecret() {
+  const field = document.getElementById("secretNumber");
+  secretVisible = !secretVisible;
+  field.type = secretVisible ? "text" : "password";
+}
+
+function checkNumber(secret, guess) {
+  let correctPlace = 0;
+  let correctDigit = 0;
+
+  for (let i = 0; i < 4; i++) {
+    if (guess[i] === secret[i]) correctPlace++;
+    else if (secret.includes(guess[i])) correctDigit++;
+  }
+
+  return { correctPlace, correctDigit };
+}
+
+function handleGuess(e) {
+  if (e.key === "Enter") {
+    const guess = e.target.value;
+    if (guess.length !== 4) return;
+
+    const enemyNumber = prompt("Въведи тайното число на другия човек (само ти го виждаш)");
+    if (!enemyNumber || enemyNumber.length !== 4) return;
+
+    const result = checkNumber(enemyNumber, guess);
+    const log = document.getElementById("guessLog");
+    log.innerHTML += `<div><b>${guess}</b> → Познати: ${result.correctDigit}, На място: ${result.correctPlace}</div>`;
+
+    e.target.value = "";
+  }
+}
+
+function handleEnemyGuess(e) {
+  if (e.key === "Enter") {
+    const guess = e.target.value;
+    if (guess.length !== 4) return;
+
+    const secret = document.getElementById("secretNumber").value;
+    if (secret.length !== 4) {
+      alert("Първо въведи твоето тайно число!");
+      return;
+    }
+
+    const result = checkNumber(secret, guess);
+    const log = document.getElementById("enemyLog");
+    log.innerHTML += `<div><b>${guess}</b> → Познати: ${result.correctDigit}, На място: ${result.correctPlace}</div>`;
+
+    e.target.value = "";
+  }
+}
+
+function newGame() {
+  document.getElementById("secretNumber").value = "";
+  document.getElementById("guessInput").value = "";
+  document.getElementById("enemyGuessInput").value = "";
+  document.getElementById("guessLog").innerHTML = "";
+  document.getElementById("enemyLog").innerHTML = "";
+}
+</script>
+</body>
+</html>
