@@ -1,2 +1,0 @@
-# igrata
-igra s chisla
